@@ -1,7 +1,6 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVzZXIxIiwiaWQiOiI2NTFkOTVkNWQ5ODhjZjE3M2IyNDFkNTYiLCJpYXQiOjE2OTY0NDQzNDZ9.A21OmUgzEs-U7eLDq2p0w6Y5nNEmpbMQaYFGEevnzgQ
-
+Authorization: Bearer 
 {
     "title": "User extraction as middleware",
     "author": "author",

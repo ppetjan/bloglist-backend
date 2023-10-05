@@ -16,22 +16,23 @@ const tokenExtractor = (request, response, next) => {
     const authorization = request.get('authorization')
     if (authorization && authorization.startsWith('Bearer ')) {
         request.token = authorization.replace('Bearer ', '')
-    }
-    else request.token = null
+    } else request.token = null
 
     next()
 }
 
 const userExtractor = async (request, response, next) => {
-    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+    if (request.token) {
+        const decodedToken = jwt.verify(request.token, process.env.SECRET)
 
-    if (!decodedToken.id) {
-        request.user = null
-        response.status(401).json({ error: 'token invalid' })
-        next()
-    }
+        if (!decodedToken.id) {
+            response.status(401).json({ error: 'token invalid' })
+            next()
+        }
 
-    request.user = await User.findById(decodedToken.id)
+        request.user = await User.findById(decodedToken.id)
+    } 
+
     next()
 }
 

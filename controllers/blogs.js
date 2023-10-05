@@ -14,11 +14,17 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-    const blog = await Blog.findById(request.params.id)
+    const blog = await Blog.findById(request.params.id).populate('user')
+    blog.user.blogs = undefined
     response.json(blog)
 })
 
 blogsRouter.post('/', async (request, response) => {
+    if (request.token === null) {
+        response.status(401).json({ error: 'invalid token' })
+        return
+    }
+    
     const body = request.body
     const user = request.user
 
@@ -38,6 +44,10 @@ blogsRouter.post('/', async (request, response) => {
 })
 
 blogsRouter.delete('/:id', async (request, response) => {
+    if (request.token === null) {
+        response.status(401).json({ error: 'invalid token' })
+        return
+    }
     const user = request.user
     const blog = await Blog.findById(request.params.id)
 
@@ -45,22 +55,32 @@ blogsRouter.delete('/:id', async (request, response) => {
 
     if (blog.user.toString() === user.id) {
         await Blog.findByIdAndRemove(request.params.id)
-    }
+    } else response.status(403).json({ error: 'not authorized to delete other users blogs' })
 
     response.status(204).end()
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-    const body = request.body
-    const blog = {
-        title: body.title,
-        author: body.author,
-        url: body.url,
-        likes: body.likes
+    if (request.token === null) {
+        response.status(401).json({ error: 'invalid token' })
+        return
     }
-    
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
-    response.json(updatedBlog)
+    const body = request.body
+    const user = request.user
+    const blog = await Blog.findById(request.params.id)
+
+    if (blog === null) response.status(404).json({ error: 'blog id invalid' })
+
+    if (blog.user.toString() === user.id) {
+        const blogUpdate = {
+            title: body.title,
+            author: body.author,
+            url: body.url,
+            likes: body.likes
+        }
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
+        response.json(updatedBlog)
+    } else response.status(403).json({ error: 'not allow to edit other users blogs' })
 })
 
 module.exports = blogsRouter
