@@ -4,8 +4,7 @@ const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 blogsRouter.get('/', async (request, response) => {
-    let blogs = await Blog
-        .find({}).populate('user')
+    let blogs = await Blog.find({}).populate('user')
     blogs = blogs.map(blog => {
         blog.user.blogs = undefined
         return blog    
@@ -14,7 +13,8 @@ blogsRouter.get('/', async (request, response) => {
 })
 
 blogsRouter.get('/:id', async (request, response) => {
-    const blog = await Blog.findById(request.params.id)
+    const blog = await Blog.findById(request.params.id).populate('user')
+    blog.user.blogs = undefined
     response.json(blog)
 })
 
@@ -52,15 +52,22 @@ blogsRouter.delete('/:id', async (request, response) => {
 
 blogsRouter.put('/:id', async (request, response) => {
     const body = request.body
-    const blog = {
+    const user = request.user
+    const blog = await Blog.findById(request.params.id)
+
+    if (blog === null) response.status(404).json({ error: 'blog id invalid' })
+    
+    const blogUpdate = {
         title: body.title,
         author: body.author,
         url: body.url,
         likes: body.likes
     }
-    
-    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blog, {new: true})
-    response.json(updatedBlog)
+
+    if (blog.user.toString() === user.id) {
+        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
+        response.json(updatedBlog)
+    }
 })
 
 module.exports = blogsRouter

@@ -1,9 +1,10 @@
-PUT http://localhost:3003/api/blogs/6512cbd83db08bb6143520e0
+PUT http://localhost:3003/api/blogs/651db07b82e7d74e9904b03b
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IlVzZXIxIiwiaWQiOiI2NTFkOTVkNWQ5ODhjZjE3M2IyNDFkNTYiLCJpYXQiOjE2OTY0OTQ1ODB9.jl-bmWxudB056xsxqJFb7VhoWJOpgN3Pb_pu5bQiLl8
 
 {
-    "title": "Test1",
-    "author": "Tester",
-    "url": "test.ing",
+    "title": "Updated blog with token access",
+    "author": "author",
+    "url": "url",
     "likes": 10
 }
