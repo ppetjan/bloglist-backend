@@ -60,26 +60,17 @@ blogsRouter.delete('/:id', async (request, response) => {
 })
 
 blogsRouter.put('/:id', async (request, response) => {
-    if (request.token === null) {
-        response.status(401).json({ error: 'invalid token' })
-        return
-    }
     const body = request.body
-    const user = request.user
-    const blog = await Blog.findById(request.params.id)
 
-    if (blog === null) response.status(404).json({ error: 'blog id invalid' })
-
-    if (blog.user.toString() === user.id) {
-        const blogUpdate = {
-            title: body.title,
-            author: body.author,
-            url: body.url,
-            likes: body.likes
-        }
-        const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
-        response.json(updatedBlog)
-    } else response.status(403).json({ error: 'not allow to edit other users blogs' })
+    const blogUpdate = {
+        title: body.title,
+        author: body.author,
+        url: body.url,
+        likes: body.likes
+    }
+    
+    const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, blogUpdate, {new: true})
+    response.json(updatedBlog)
 })
 
 module.exports = blogsRouter
